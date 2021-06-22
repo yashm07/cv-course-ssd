@@ -7,17 +7,22 @@ import imageio
 
 # Defining a function for detection
 def detect(frame, net, transform):
+    # Transforming input
     height, width = frame.shape[:2]
     frame_t = transform(frame)[0]
     x = torch.from_numpy(frame_t).permute(2,0,1)
     x = Variable(x.unsqueeze(0))
     
+    # Passing into neural network
     y = net(x)
     
+    # Accesssing outputs
     detections = y.data
     scale = torch.Tensor([width, height, width, height])
     for i in range(detections.size(1)):
         j = 0
+        
+        # Displaying boxes and class
         while detections[0,i,j,0] >= 0.6:
             pt = (detections[0, i, j, 1:] * scale).numpy()
             cv2.rectangle(frame, (int(pt[0]), int(pt[1])), (int(pt[2]), int(pt[3])), (255, 0, 0), 2)
